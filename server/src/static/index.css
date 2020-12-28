@@ -1,0 +1,13 @@
+.connect-github {
+    padding: 30px;
+    margin: 20px;
+    border: none;
+    font-family: monospace;
+    color: white;
+    background-color: green;
+    font-size: 28px;
+}
+
+.connect-github:hover {
+    transform: scale(0.98);
+}
