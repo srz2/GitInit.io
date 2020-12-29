@@ -15,6 +15,19 @@
             <button class="connect-github">Connect to GitHub</button>
         </div>
 
+        <div class="authorized">
+            <form action="/create" name="form_create_repo">
+                <label>Name:</label>
+                <input type="text" name="new-repo-name" id="">
+                <label>Description:</label>
+                <input type="text" name="new-repo-desc" id="">
+                <label>Private</label>
+                <input type="checkbox" name="new-repo-isprivate" id="">
+                <input type="hidden" name="token" id="form-hidden-token">
+                <button type="submit">Create</button>
+            </form>
+        </div>
+
         <script src="/static/index.js"></script>
     </body>
 </html>

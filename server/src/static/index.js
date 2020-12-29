@@ -1,8 +1,9 @@
 const lblUsername = document.querySelector('#lblGitHubUsername');
 const authElements = document.querySelectorAll(".authorized");
 const nonauthElemnents = document.querySelectorAll(".not-authorized");
-var btnConnect = document.querySelector('.connect-github');
-var btnSignout = document.querySelector('#btnSignout');
+const btnConnect = document.querySelector('.connect-github');
+const btnSignout = document.querySelector('#btnSignout');
+const hidToken = document.querySelector('#form-hidden-token');
 
 var is_authorized = false;
 const cookies = new Map()
@@ -55,22 +56,6 @@ function setUserAuthorized(isAuthorized) {
     })
 }
 
-async function getGitHubUsername() {
-    const response = await fetch('https://api.github.com/user',{
-        headers: {
-            'Authorization': 'token ' + cookies.get('authorization'),
-        },
-    })
-
-    if (response.status == 200) {
-        var json = await response.json();
-        json['status'] = response.status
-        return json;        
-    } else {
-        return { "status": response.status }
-    }
-}
-
 async function validateAuthorizationToken() {
     const data = await getGitHubUsername()
     lblUsername.innerHTML = data['login'] !== undefined ? data['login'] : 'N/A';
@@ -84,10 +69,51 @@ async function authLogic() {
         if (!is_authorized) {
             console.log('Invalid token');
             deleteCookie('authorization')
+        } else {
+
+            hidToken.value = cookies.get('authorization');
         }
     }
     setUserAuthorized(is_authorized);
 }
 
+/// ------------------------------
+/// Start - GITHUB API FUNCTIONS
+/// ------------------------------
+
+async function getGitHubUsername() {
+    const response = await fetch('https://api.github.com/user', {
+        headers: {
+            'Authorization': 'token ' + cookies.get('authorization'),
+        },
+    })
+
+    if (response.status == 200) {
+        var json = await response.json();
+        json['status'] = response.status
+        return json;
+    } else {
+        return { "status": response.status }
+    }
+}
+
+async function createGitHubRepo(new_repo_name, new_repo_desc, new_repo_isprivate) {
+    const response = await fetch('https://api.github.com/user/repos', {
+        headers: {
+            'Authorization': 'token ' + cookies.get('authorization'),
+        },
+        body: '{"name":"' + new_repo_name + '"}',
+        method:"POST",
+    })
+
+    var json = await response.json();
+    json['status'] = response.status;
+
+    return json;
+}
+
+/// ------------------------------
+/// End - GITHUB API FUNCTIONS
+/// ------------------------------
 
 authLogic();

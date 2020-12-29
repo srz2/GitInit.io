@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 import configparser
 from flask import Flask, session, request, make_response, render_template, redirect, send_from_directory
@@ -53,6 +54,40 @@ def connected():
         error_desc = request.args.get('error_description')
         error_uri = request.args.get('error_uri')
         print(f'Error Occured: {error_code}\n{error_desc}\n{error_uri}')
+        return render_template('oauth_error.html')
+
+@app.route('/create')
+def create_repo():
+    token = request.args.get('token')
+    name = request.args.get('new-repo-name')
+    desc = request.args.get('new-repo-desc')
+    isprivate = request.args.get('new-repo-isprivate')
+
+    if not isprivate is None:
+        isprivate = isprivate.lower()
+    if isprivate == 'on':
+        is_private = True
+    else:
+        is_private = False
+
+    print('Token:', token)
+    print('Name:', name)
+    print('desc:', desc)
+    print('Private:', is_private)
+
+    headers = {'authorization': 'token ' + token}
+    payload = json.dumps({'name': name,
+               'description': desc,
+               'private': is_private})
+
+    r = requests.post('https://api.github.com/user/repos', headers=headers, data=payload)
+
+    print(r)
+    if r.status_code == 200 or r.status_code == 201:
+        return render_template('new.html')
+    elif r.status_code == 422:
+        return render_template('already-exists.html')
+    else:
         return render_template('oauth_error.html')
 
 if __name__ == "__main__":
